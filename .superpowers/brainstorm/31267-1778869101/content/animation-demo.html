@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preview animaciones</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #111; color: #f5f0e8; font-family: 'Georgia', serif; }
+
+  .page-header {
+    text-align: center;
+    padding: 2rem;
+    border-bottom: 1px solid #2a2010;
+  }
+  .page-header h1 { font-size: 1.2rem; letter-spacing: 3px; color: #c9a84c; text-transform: uppercase; font-weight: 400; }
+  .page-header p { color: #888; font-size: 0.85rem; margin-top: 0.5rem; font-family: sans-serif; }
+
+  .demos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #2a2010; min-height: calc(100vh - 100px); }
+
+  .demo-panel {
+    background: #0a0a0a;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .demo-panel:hover { background: #0f0f0f; }
+  .demo-panel.selected { outline: 2px solid #c9a84c; }
+
+  .demo-label {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #1a1a0a;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .demo-letter {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: #1a1209; border: 1px solid #c9a84c;
+    display: flex; align-items: center; justify-content: center;
+    font-family: sans-serif; font-size: 12px; color: #c9a84c; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .demo-panel.selected .demo-letter { background: #c9a84c; color: #0a0a0a; }
+  .demo-label h3 { font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; color: #c9a84c; font-weight: 400; }
+  .demo-label p { font-size: 0.75rem; color: #666; font-family: sans-serif; margin-top: 2px; }
+
+  .demo-screen {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    min-height: 380px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── OPCIÓN A: Fluido y elegante ── */
+  .demo-a .fake-hero {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem;
+  }
+  .demo-a .line {
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+  .demo-a .line span {
+    display: block;
+    transform: translateY(100%);
+    opacity: 0;
+    animation: slideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .demo-a .line:nth-child(1) span { animation-delay: 0.1s; font-size: 0.7rem; letter-spacing: 4px; color: #c9a84c; text-transform: uppercase; }
+  .demo-a .line:nth-child(2) span { animation-delay: 0.35s; font-size: 1.8rem; color: #f5f0e8; line-height: 1.1; }
+  .demo-a .line:nth-child(3) span { animation-delay: 0.55s; font-size: 1.8rem; color: #f5f0e8; font-style: italic; line-height: 1.1; }
+  .demo-a .divider {
+    width: 0; height: 1px; background: #c9a84c;
+    animation: expandLine 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
+    margin: 1rem 0;
+  }
+  .demo-a .cta {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeUp 0.6s ease 1.1s forwards;
+    display: inline-block;
+    border: 1px solid #c9a84c;
+    color: #c9a84c;
+    padding: 0.4rem 1rem;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: sans-serif;
+    width: fit-content;
+  }
+  .demo-a .scroll-cards {
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .demo-a .mini-card {
+    width: 80px; height: 50px;
+    border: 1px solid #2a2010;
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateX(20px);
+    animation: fadeLeft 0.5s ease forwards;
+  }
+  .demo-a .mini-card:nth-child(1) { animation-delay: 1.3s; background: #1a1209; }
+  .demo-a .mini-card:nth-child(2) { animation-delay: 1.5s; background: #150f07; }
+  .demo-a .mini-card:nth-child(3) { animation-delay: 1.7s; background: #100c05; }
+
+  @keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
+  @keyframes expandLine { to { width: 40px; } }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeLeft { to { opacity: 0.6; transform: translateX(0); } }
+
+  /* ── OPCIÓN B: Cinemático ── */
+  .demo-b .scene {
+    width: 100%; height: 100%;
+    position: absolute; inset: 0;
+    overflow: hidden;
+  }
+  .demo-b .parallax-bg {
+    position: absolute; inset: -20px;
+    background: linear-gradient(160deg, #1a1209 0%, #0a0a0a 60%);
+    animation: parallaxFloat 4s ease-in-out infinite alternate;
+  }
+  .demo-b .content {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    justify-content: center; padding: 2rem;
+  }
+  .demo-b .scramble {
+    font-size: 0.65rem; letter-spacing: 4px; color: #c9a84c;
+    text-transform: uppercase; margin-bottom: 1rem;
+    font-family: 'Courier New', monospace;
+    animation: scrambleText 0.05s steps(1) infinite;
+    --text: "MOBILE BAR · IBIZA";
+  }
+  .demo-b .big-text {
+    font-size: 2rem; line-height: 1;
+    overflow: hidden;
+  }
+  .demo-b .char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(60px) rotate(5deg);
+    animation: charReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .demo-b .char:nth-child(1) { animation-delay: 0.1s; }
+  .demo-b .char:nth-child(2) { animation-delay: 0.15s; }
+  .demo-b .char:nth-child(3) { animation-delay: 0.2s; }
+  .demo-b .char:nth-child(4) { animation-delay: 0.25s; }
+  .demo-b .char:nth-child(5) { animation-delay: 0.3s; }
+  .demo-b .char:nth-child(6) { animation-delay: 0.35s; }
+  .demo-b .char:nth-child(7) { animation-delay: 0.4s; }
+  .demo-b .char:nth-child(8) { animation-delay: 0.45s; }
+  .demo-b .line2 .char:nth-child(1) { animation-delay: 0.55s; }
+  .demo-b .line2 .char:nth-child(2) { animation-delay: 0.6s; }
+  .demo-b .line2 .char:nth-child(3) { animation-delay: 0.65s; }
+  .demo-b .line2 .char:nth-child(4) { animation-delay: 0.7s; }
+  .demo-b .line2 .char:nth-child(5) { animation-delay: 0.75s; }
+  .demo-b .line2 .char:nth-child(6) { animation-delay: 0.8s; }
+  .demo-b .line2 .char:nth-child(7) { animation-delay: 0.85s; }
+
+  .demo-b .progress-bar {
+    position: absolute; bottom: 0; left: 0;
+    height: 2px; background: #c9a84c;
+    animation: progressFill 3s linear infinite;
+    box-shadow: 0 0 6px #c9a84c;
+  }
+  .demo-b .scroll-hint {
+    position: absolute; bottom: 1.5rem; right: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.5s ease 1.5s forwards;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .demo-b .scroll-line {
+    width: 1px; height: 40px; background: linear-gradient(to bottom, #c9a84c, transparent);
+    animation: scrollPulse 1.5s ease-in-out 2s infinite;
+  }
+  .demo-b .scroll-text { font-size: 0.55rem; letter-spacing: 3px; color: #c9a84c; text-transform: uppercase; font-family: sans-serif; }
+
+  @keyframes parallaxFloat { from { transform: translateY(0) scale(1.05); } to { transform: translateY(-10px) scale(1); } }
+  @keyframes charReveal { to { opacity: 1; transform: translateY(0) rotate(0deg); } }
+  @keyframes progressFill { from { width: 0; } to { width: 100%; } }
+  @keyframes scrollPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+  /* ── OPCIÓN C: Inmersivo ── */
+  .demo-c .scene {
+    width: 100%; height: 100%;
+    position: absolute; inset: 0;
+    overflow: hidden;
+  }
+  .demo-c .particles {
+    position: absolute; inset: 0;
+  }
+  .demo-c .particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: #c9a84c;
+    border-radius: 50%;
+    animation: floatParticle linear infinite;
+  }
+  .demo-c .particle:nth-child(1)  { left: 10%; top: 80%; animation-duration: 6s; animation-delay: 0s; }
+  .demo-c .particle:nth-child(2)  { left: 20%; top: 90%; animation-duration: 8s; animation-delay: 1s; width: 3px; height: 3px; opacity: 0.6; }
+  .demo-c .particle:nth-child(3)  { left: 35%; top: 85%; animation-duration: 5s; animation-delay: 2s; }
+  .demo-c .particle:nth-child(4)  { left: 50%; top: 75%; animation-duration: 7s; animation-delay: 0.5s; opacity: 0.4; }
+  .demo-c .particle:nth-child(5)  { left: 65%; top: 88%; animation-duration: 9s; animation-delay: 1.5s; width: 3px; height: 3px; }
+  .demo-c .particle:nth-child(6)  { left: 80%; top: 82%; animation-duration: 6s; animation-delay: 3s; opacity: 0.7; }
+  .demo-c .particle:nth-child(7)  { left: 90%; top: 92%; animation-duration: 7s; animation-delay: 0.8s; }
+  .demo-c .particle:nth-child(8)  { left: 5%;  top: 70%; animation-duration: 10s; animation-delay: 2s; opacity: 0.3; width: 4px; height: 4px; }
+  .demo-c .particle:nth-child(9)  { left: 55%; top: 95%; animation-duration: 5s; animation-delay: 4s; }
+  .demo-c .particle:nth-child(10) { left: 75%; top: 78%; animation-duration: 8s; animation-delay: 1.2s; opacity: 0.5; }
+
+  .demo-c .liquid-cursor {
+    position: absolute;
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    border: 1px solid rgba(201, 168, 76, 0.4);
+    animation: cursorOrbit 4s linear infinite;
+    pointer-events: none;
+  }
+  .demo-c .liquid-cursor::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px; height: 6px;
+    background: #c9a84c;
+    border-radius: 50%;
+  }
+
+  .demo-c .content {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    justify-content: center; padding: 2rem;
+    z-index: 2;
+  }
+  .demo-c .glitch-text {
+    font-size: 2rem; color: #f5f0e8;
+    line-height: 1;
+    animation: glitch 4s infinite;
+    position: relative;
+  }
+  .demo-c .glitch-text::before,
+  .demo-c .glitch-text::after {
+    content: attr(data-text);
+    position: absolute; top: 0; left: 0;
+    width: 100%;
+  }
+  .demo-c .glitch-text::before {
+    color: #c9a84c; clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+    animation: glitchTop 4s infinite; opacity: 0.8;
+  }
+  .demo-c .glitch-text::after {
+    color: #fff; clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+    animation: glitchBottom 4s infinite; opacity: 0.5;
+  }
+  .demo-c .marquee-wrap {
+    position: absolute; bottom: 2rem; left: 0; right: 0;
+    overflow: hidden; border-top: 1px solid #2a2010; padding-top: 0.5rem;
+  }
+  .demo-c .marquee {
+    display: flex; gap: 2rem; white-space: nowrap;
+    animation: marqueeMove 8s linear infinite;
+    font-size: 0.65rem; letter-spacing: 3px; color: #c9a84c;
+    text-transform: uppercase; font-family: sans-serif;
+  }
+  .demo-c .liquid-transition {
+    position: absolute; inset: 0;
+    background: #c9a84c;
+    clip-path: circle(0% at 50% 50%);
+    animation: liquidIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+    pointer-events: none; z-index: 10;
+  }
+  .demo-c .liquid-out {
+    position: absolute; inset: 0;
+    background: #0a0a0a;
+    clip-path: circle(150% at 50% 50%);
+    animation: liquidOut 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+    pointer-events: none; z-index: 11;
+  }
+
+  @keyframes floatParticle {
+    0%   { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-300px) scale(0); opacity: 0; }
+  }
+  @keyframes cursorOrbit {
+    from { transform: translate(calc(50vw - 180px), calc(50% - 30px)); }
+    25%  { transform: translate(calc(50vw - 80px), calc(50% - 80px)); }
+    50%  { transform: translate(calc(50vw + 20px), calc(50% - 30px)); }
+    75%  { transform: translate(calc(50vw - 80px), calc(50% + 20px)); }
+    to   { transform: translate(calc(50vw - 180px), calc(50% - 30px)); }
+  }
+  @keyframes glitch {
+    0%, 90%, 100% { transform: translate(0); }
+    91% { transform: translate(-2px, 1px); }
+    93% { transform: translate(2px, -1px); }
+    95% { transform: translate(-1px, 2px); }
+    97% { transform: translate(1px, -2px); }
+  }
+  @keyframes glitchTop {
+    0%, 90%, 100% { transform: translate(0); }
+    91% { transform: translate(3px, 0); }
+    93% { transform: translate(-3px, 0); }
+    95% { transform: translate(0); }
+  }
+  @keyframes glitchBottom {
+    0%, 90%, 100% { transform: translate(0); }
+    92% { transform: translate(-3px, 0); }
+    94% { transform: translate(3px, 0); }
+    96% { transform: translate(0); }
+  }
+  @keyframes marqueeMove {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @keyframes liquidIn {
+    from { clip-path: circle(0% at 50% 50%); }
+    to   { clip-path: circle(150% at 50% 50%); }
+  }
+  @keyframes liquidOut {
+    from { clip-path: circle(150% at 50% 50%); opacity: 1; }
+    to   { clip-path: circle(150% at 50% 50%); opacity: 0; }
+  }
+
+  /* Select interaction */
+  .demo-panel { user-select: none; }
+  .select-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #1a1209; border-top: 1px solid #c9a84c;
+    padding: 0.75rem 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: sans-serif; font-size: 0.8rem; color: #c9a84c;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 100;
+  }
+  .select-bar.visible { transform: translateY(0); }
+  .select-bar span { letter-spacing: 2px; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Preview de animaciones</h1>
+  <p>Haz clic en el panel que más te guste para seleccionarlo</p>
+</div>
+
+<div class="demos">
+
+  <!-- OPCIÓN A -->
+  <div class="demo-panel demo-a" onclick="selectOption('A', this)">
+    <div class="demo-label">
+      <div class="demo-letter">A</div>
+      <div>
+        <h3>Fluido y elegante</h3>
+        <p>Texto deslizante · Apariciones suaves</p>
+      </div>
+    </div>
+    <div class="demo-screen">
+      <div class="fake-hero">
+        <div class="line"><span>Mobile Bar · Ibiza</span></div>
+        <div class="line"><span>Crafted for</span></div>
+        <div class="line"><span>the extraordinary.</span></div>
+        <div class="divider"></div>
+        <div class="cta">Book your event</div>
+        <div class="scroll-cards">
+          <div class="mini-card"></div>
+          <div class="mini-card"></div>
+          <div class="mini-card"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPCIÓN B -->
+  <div class="demo-panel demo-b" onclick="selectOption('B', this)">
+    <div class="demo-label">
+      <div class="demo-letter">B</div>
+      <div>
+        <h3>Cinemático</h3>
+        <p>Parallax · Letras · Scroll momentum</p>
+      </div>
+    </div>
+    <div class="demo-screen">
+      <div class="scene">
+        <div class="parallax-bg"></div>
+        <div class="content">
+          <div class="scramble" id="scramble">MOBILE BAR · IBIZA</div>
+          <div class="big-text">
+            <span class="char">K</span><span class="char">A</span><span class="char">M</span><span class="char">I</span>&nbsp;<span class="char">N</span><span class="char">O</span>
+          </div>
+          <div class="big-text line2" style="font-style:italic; color:#c9a84c;">
+            <span class="char">G</span><span class="char">L</span><span class="char">A</span><span class="char">S</span><span class="char">S</span>
+          </div>
+        </div>
+        <div class="progress-bar"></div>
+        <div class="scroll-hint">
+          <div class="scroll-line"></div>
+          <div class="scroll-text">Scroll</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPCIÓN C -->
+  <div class="demo-panel demo-c" onclick="selectOption('C', this)">
+    <div class="demo-label">
+      <div class="demo-letter">C</div>
+      <div>
+        <h3>Inmersivo</h3>
+        <p>Partículas · Glitch · Cursor · Marquee</p>
+      </div>
+    </div>
+    <div class="demo-screen">
+      <div class="scene">
+        <div class="liquid-transition"></div>
+        <div class="liquid-out"></div>
+        <div class="particles">
+          <div class="particle"></div><div class="particle"></div>
+          <div class="particle"></div><div class="particle"></div>
+          <div class="particle"></div><div class="particle"></div>
+          <div class="particle"></div><div class="particle"></div>
+          <div class="particle"></div><div class="particle"></div>
+        </div>
+        <div class="liquid-cursor"></div>
+        <div class="content">
+          <div style="font-size:0.65rem;letter-spacing:4px;color:#c9a84c;text-transform:uppercase;margin-bottom:0.75rem;font-family:sans-serif;">Kami No Glass</div>
+          <div class="glitch-text" data-text="IBIZA BAR">IBIZA BAR</div>
+          <div class="glitch-text" data-text="CATERING" style="font-style:italic;color:#c9a84c;font-size:1.5rem;">CATERING</div>
+        </div>
+        <div class="marquee-wrap">
+          <div class="marquee">
+            <span>Signature Cocktails</span>
+            <span>·</span>
+            <span>Healthy Recovery</span>
+            <span>·</span>
+            <span>Full Event Management</span>
+            <span>·</span>
+            <span>Rental Equipment</span>
+            <span>·</span>
+            <span>Signature Cocktails</span>
+            <span>·</span>
+            <span>Healthy Recovery</span>
+            <span>·</span>
+            <span>Full Event Management</span>
+            <span>·</span>
+            <span>Rental Equipment</span>
+            <span>·</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="select-bar" id="selectBar">
+  <span id="selectText">Seleccionado: —</span>
+  <span>Dime tu elección en el terminal</span>
+</div>
+
+<script>
+  function selectOption(letter, el) {
+    document.querySelectorAll('.demo-panel').forEach(p => p.classList.remove('selected'));
+    document.querySelectorAll('.demo-letter').forEach(l => {
+      l.style.background = '#1a1209';
+      l.style.color = '#c9a84c';
+    });
+    el.classList.add('selected');
+    el.querySelector('.demo-letter').style.background = '#c9a84c';
+    el.querySelector('.demo-letter').style.color = '#0a0a0a';
+    document.getElementById('selectText').textContent = 'Seleccionado: Opción ' + letter;
+    document.getElementById('selectBar').classList.add('visible');
+
+    // Record selection
+    if (window.__recordChoice) window.__recordChoice(letter.toLowerCase(), el.querySelector('h3').textContent);
+  }
+
+  // Restart animations every 4 seconds for B and C
+  setInterval(() => {
+    ['demo-b', 'demo-c'].forEach(cls => {
+      const el = document.querySelector('.' + cls + ' .demo-screen');
+      if (!el) return;
+      const clone = el.cloneNode(true);
+      el.parentNode.replaceChild(clone, el);
+    });
+    // Also restart A
+    const aEl = document.querySelector('.demo-a .fake-hero');
+    if (aEl) {
+      const clone = aEl.cloneNode(true);
+      aEl.parentNode.replaceChild(clone, aEl);
+    }
+  }, 5000);
+</script>
+
+</body>
+</html>
