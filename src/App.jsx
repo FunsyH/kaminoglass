@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { lazy, Suspense, useEffect } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { LanguageProvider } from './i18n'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
@@ -14,6 +14,24 @@ const Contact  = lazy(() => import('./components/Contact'))
 const GalleryPage = lazy(() => import('./pages/GalleryPage'))
 
 function Landing() {
+  const { hash } = useLocation()
+
+  useEffect(() => {
+    if (!hash) return
+    const id = hash.replace('#', '')
+    let attempts = 0
+    const interval = setInterval(() => {
+      const el = document.getElementById(id)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' })
+        clearInterval(interval)
+      } else if (++attempts > 20) {
+        clearInterval(interval)
+      }
+    }, 100)
+    return () => clearInterval(interval)
+  }, [hash])
+
   return (
     <div className="bg-bg-primary min-h-screen">
       <Navbar />
