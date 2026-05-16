@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { LanguageProvider } from './i18n'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
@@ -23,8 +24,9 @@ function Landing() {
     const interval = setInterval(() => {
       const el = document.getElementById(id)
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth' })
         clearInterval(interval)
+        ScrollTrigger.refresh()
+        setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100)
       } else if (++attempts > 20) {
         clearInterval(interval)
       }

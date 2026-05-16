@@ -14,40 +14,30 @@ export default function Gallery() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headingRef.current,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: 'top 85%',
-            once: true,
-          },
-        }
-      )
-
       const items = gridRef.current.querySelectorAll('[data-cat-item]')
-      gsap.fromTo(
-        items,
-        { opacity: 0, scale: 0.92, y: 20 },
-        {
-          opacity: 1,
-          scale: 1,
-          y: 0,
-          duration: 0.6,
-          stagger: 0.08,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: gridRef.current,
-            start: 'top 85%',
-            once: true,
-          },
-        }
-      )
+      const isAbove = sectionRef.current.getBoundingClientRect().bottom <= 0
+
+      if (isAbove) {
+        gsap.set(headingRef.current, { opacity: 1, y: 0 })
+        gsap.set(items, { opacity: 1, scale: 1, y: 0 })
+      } else {
+        gsap.fromTo(
+          headingRef.current,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1, y: 0, duration: 0.7, ease: 'power2.out',
+            scrollTrigger: { trigger: headingRef.current, start: 'top 85%', once: true },
+          }
+        )
+        gsap.fromTo(
+          items,
+          { opacity: 0, scale: 0.92, y: 20 },
+          {
+            opacity: 1, scale: 1, y: 0, duration: 0.6, stagger: 0.08, ease: 'power2.out',
+            scrollTrigger: { trigger: gridRef.current, start: 'top 85%', once: true },
+          }
+        )
+      }
 
       // Salida — parallax sin pin
       const exitTl = gsap.timeline({

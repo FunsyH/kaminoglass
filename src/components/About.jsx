@@ -14,21 +14,25 @@ export default function About() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Estado inicial — GSAP controla todo, sin ScrollTrigger en la entrada
-      gsap.set(textRef.current, { opacity: 0, x: -40 })
-      gsap.set(imageWrapRef.current, { opacity: 0, scale: 0.95 })
-      gsap.set(dividerRef.current, { width: 0 })
+      const isAbove = sectionRef.current.getBoundingClientRect().bottom <= 0
 
-      // Entrada con delay, igual que Services — no depende del scroll
-      gsap.to(textRef.current, {
-        opacity: 1, x: 0, duration: 0.9, ease: 'power2.out', delay: 0.2,
-      })
-      gsap.to(imageWrapRef.current, {
-        opacity: 1, scale: 1, duration: 0.9, ease: 'power2.out', delay: 0.35,
-      })
-      gsap.to(dividerRef.current, {
-        width: '48px', duration: 0.7, ease: 'power2.inOut', delay: 0.5,
-      })
+      if (!isAbove) {
+        // Estado inicial — GSAP controla todo, sin ScrollTrigger en la entrada
+        gsap.set(textRef.current, { opacity: 0, x: -40 })
+        gsap.set(imageWrapRef.current, { opacity: 0, scale: 0.95 })
+        gsap.set(dividerRef.current, { width: 0 })
+
+        // Entrada con delay — no depende del scroll
+        gsap.to(textRef.current, {
+          opacity: 1, x: 0, duration: 0.9, ease: 'power2.out', delay: 0.2,
+        })
+        gsap.to(imageWrapRef.current, {
+          opacity: 1, scale: 1, duration: 0.9, ease: 'power2.out', delay: 0.35,
+        })
+        gsap.to(dividerRef.current, {
+          width: '48px', duration: 0.7, ease: 'power2.inOut', delay: 0.5,
+        })
+      }
 
       // Parallax suave en la imagen mientras scrolleas por la sección
       gsap.to(imageWrapRef.current, {

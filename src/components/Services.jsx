@@ -16,18 +16,19 @@ export default function Services() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const cards = cardsRef.current.querySelectorAll('[data-card]')
+      const isAbove = sectionRef.current.getBoundingClientRect().bottom <= 0
 
-      // GSAP controla el estado inicial — sin CSS animation
-      gsap.set([headingRef.current, cards], { opacity: 0, y: 40 })
-
-      // Entrada: aparecen con delay escalonado al montar, sin ScrollTrigger
-      gsap.to(headingRef.current, {
-        opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', delay: 0.2,
-      })
-      gsap.to(cards, {
-        opacity: 1, y: 0, duration: 0.6, ease: 'power2.out',
-        stagger: 0.12, delay: 0.35,
-      })
+      if (!isAbove) {
+        // Entrada: aparecen con delay escalonado al montar, sin ScrollTrigger
+        gsap.set([headingRef.current, cards], { opacity: 0, y: 40 })
+        gsap.to(headingRef.current, {
+          opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', delay: 0.2,
+        })
+        gsap.to(cards, {
+          opacity: 1, y: 0, duration: 0.6, ease: 'power2.out',
+          stagger: 0.12, delay: 0.35,
+        })
+      }
 
       // Salida: parallax sin pin — ocurre mientras la sección sale de la pantalla
       const exitTl = gsap.timeline({

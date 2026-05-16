@@ -19,6 +19,20 @@ export default function Ibiza() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      const isAbove = sectionRef.current.getBoundingClientRect().bottom <= 0
+
+      if (isAbove) {
+        // Sección ya pasó — mostrar todo inmediatamente con valores finales
+        statsRefs.current.forEach((el, i) => {
+          if (!el) return
+          const numEl = el.querySelector('[data-num]')
+          if (numEl) numEl.textContent = STATS[i].value
+          gsap.set(el, { opacity: 1, y: 0 })
+        })
+        gsap.set(quoteRef.current, { opacity: 1, y: 0 })
+        return
+      }
+
       statsRefs.current.forEach((el, i) => {
         if (!el) return
         const target = STATS[i].value
@@ -28,11 +42,7 @@ export default function Ibiza() {
           val: target,
           duration: 1.6,
           ease: 'power2.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 85%',
-            once: true,
-          },
+          scrollTrigger: { trigger: el, start: 'top 85%', once: true },
           onUpdate() {
             const numEl = el.querySelector('[data-num]')
             if (numEl) numEl.textContent = Math.round(obj.val)
@@ -43,16 +53,8 @@ export default function Ibiza() {
           el,
           { opacity: 0, y: 30 },
           {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            delay: i * 0.12,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: el,
-              start: 'top 85%',
-              once: true,
-            },
+            opacity: 1, y: 0, duration: 0.6, delay: i * 0.12, ease: 'power2.out',
+            scrollTrigger: { trigger: el, start: 'top 85%', once: true },
           }
         )
       })
@@ -61,15 +63,8 @@ export default function Ibiza() {
         quoteRef.current,
         { opacity: 0, y: 20 },
         {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: quoteRef.current,
-            start: 'top 85%',
-            once: true,
-          },
+          opacity: 1, y: 0, duration: 0.8, ease: 'power2.out',
+          scrollTrigger: { trigger: quoteRef.current, start: 'top 85%', once: true },
         }
       )
     }, sectionRef)
